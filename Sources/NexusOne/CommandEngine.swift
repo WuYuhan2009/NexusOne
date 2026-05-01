@@ -70,10 +70,10 @@ final class CommandEngine: ObservableObject {
 
     func batteryLab() -> String {
         guard let snapshot = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(), let list = IOPSCopyPowerSourcesList(snapshot)?.takeRetainedValue() as? [CFTypeRef], let source = list.first, let detail = IOPSGetPowerSourceDescription(snapshot, source)?.takeUnretainedValue() as? [String: Any] else { return "Battery data unavailable" }
-        let cycle = detail[kIOPSCycleCountKey as String] ?? "n/a"
-        let max = detail[kIOPSMaxCapacityKey as String] ?? 0
-        let current = detail[kIOPSCurrentCapacityKey as String] ?? 0
-        let watts = detail[kIOPSPowerSourceStateKey as String] ?? "n/a"
+        let cycle = detail["CycleCount"] ?? detail["AppleRawCurrentCapacity"] ?? "n/a"
+        let max = detail[kIOPSMaxCapacityKey as String] ?? detail["DesignCapacity"] ?? 0
+        let current = detail[kIOPSCurrentCapacityKey as String] ?? detail["AppleRawCurrentCapacity"] ?? 0
+        let watts = detail[kIOPSPowerSourceStateKey as String] ?? detail["BatteryHealth"] ?? "n/a"
         return "Cycle: \(cycle)\nCurrent/Max: \(current)/\(max)\nState: \(watts)"
     }
 

@@ -31,7 +31,6 @@ struct OnboardingFlowView: View {
                         .tag(idx)
                     }
                 }
-                .tabViewStyle(.page)
                 HStack {
                     Button("上一步") { if page > 0 { page -= 1 } }
                     Spacer()

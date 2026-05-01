@@ -1,6 +1,7 @@
 import Foundation
 import Security
 
+@MainActor
 final class PrivilegedHelper {
     static let shared = PrivilegedHelper()
     private init() {}
