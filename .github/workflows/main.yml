@@ -21,7 +21,7 @@ jobs:
         run: brew install create-dmg
       - name: Build Release
         run: |
-          xcodebuild -scheme NexusOne -configuration Release -derivedDataPath build -packagePath . CODE_SIGNING_ALLOWED=NO
+          xcodebuild -scheme NexusOne -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO
       - name: Prepare DMG assets
         run: |
           mkdir -p assets
