@@ -22,6 +22,33 @@ jobs:
       - name: Build Release
         run: |
           xcodebuild -scheme NexusOne -configuration Release -destination "platform=macOS" -derivedDataPath build CODE_SIGNING_ALLOWED=NO
+      - name: Prepare .app bundle from SwiftPM output
+        run: |
+          mkdir -p dist/NexusOne.app/Contents/MacOS
+          mkdir -p dist/NexusOne.app/Contents/Resources
+          BIN_PATH=$(find build -type f -path "*/Build/Products/Release/NexusOne" | head -1)
+          if [ -z "$BIN_PATH" ]; then
+            echo "NexusOne executable not found" >&2
+            exit 1
+          fi
+          cp "$BIN_PATH" dist/NexusOne.app/Contents/MacOS/NexusOne
+          chmod +x dist/NexusOne.app/Contents/MacOS/NexusOne
+          cat > dist/NexusOne.app/Contents/Info.plist <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key><string>NexusOne</string>
+            <key>CFBundleIdentifier</key><string>com.nexusone.app</string>
+            <key>CFBundleName</key><string>NexusOne</string>
+            <key>CFBundlePackageType</key><string>APPL</string>
+            <key>CFBundleShortVersionString</key><string>1.0.0</string>
+            <key>CFBundleVersion</key><string>${GITHUB_RUN_NUMBER}</string>
+            <key>LSMinimumSystemVersion</key><string>15.0</string>
+            <key>NSHighResolutionCapable</key><true/>
+          </dict>
+          </plist>
+PLIST
       - name: Prepare DMG assets
         run: |
           mkdir -p assets
@@ -31,10 +58,12 @@ jobs:
           if [ ! -f assets/AppIcon.icns ]; then
             cp /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarCustomizeIcon.icns assets/AppIcon.icns
           fi
+          cp assets/AppIcon.icns dist/NexusOne.app/Contents/Resources/AppIcon.icns
+      - name: Pack .app zip
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent dist/NexusOne.app dist/NexusOne.app.zip
       - name: Create DMG
         run: |
-          APP_PATH=$(find build -name "NexusOne.app" | head -1)
-          mkdir -p dist
           create-dmg \
             --volname "NexusOne" \
             --background "assets/dmg-background.png" \
@@ -46,12 +75,17 @@ jobs:
             --app-drop-link 600 260 \
             --volicon "assets/AppIcon.icns" \
             "dist/NexusOne.dmg" \
-            "$APP_PATH"
-      - name: Upload Artifact
+            "dist/NexusOne.app"
+      - name: Upload DMG Artifact
         uses: actions/upload-artifact@v4
         with:
           name: NexusOne-dmg
           path: dist/NexusOne.dmg
+      - name: Upload APP Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusOne-app
+          path: dist/NexusOne.app.zip
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -64,7 +98,13 @@ jobs:
         with:
           name: NexusOne-dmg
           path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: NexusOne-app
+          path: dist
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/NexusOne.dmg
+          files: |
+            dist/NexusOne.dmg
+            dist/NexusOne.app.zip
