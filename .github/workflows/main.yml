@@ -21,7 +21,16 @@ jobs:
         run: brew install create-dmg
       - name: Build Release
         run: |
-          xcodebuild -scheme NexusOne -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO
+          xcodebuild -scheme NexusOne -configuration Release -derivedDataPath build -packagePath . CODE_SIGNING_ALLOWED=NO
+      - name: Prepare DMG assets
+        run: |
+          mkdir -p assets
+          if [ ! -f assets/dmg-background.png ]; then
+            /usr/bin/sips -s format png /System/Library/CoreServices/DefaultDesktop.heic --out assets/dmg-background.png || true
+          fi
+          if [ ! -f assets/AppIcon.icns ]; then
+            cp /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarCustomizeIcon.icns assets/AppIcon.icns
+          fi
       - name: Create DMG
         run: |
           APP_PATH=$(find build -name "NexusOne.app" | head -1)
