@@ -48,7 +48,7 @@ jobs:
             <key>NSHighResolutionCapable</key><true/>
           </dict>
           </plist>
-PLIST
+          PLIST
       - name: Prepare DMG assets
         run: |
           mkdir -p assets
