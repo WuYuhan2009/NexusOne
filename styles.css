@@ -1,0 +1,17 @@
+:root{--bg:#071226;--panel:#0f1d3d;--accent:#50d8ff;--text:#e8f3ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#071226,#0e2249);color:var(--text)}
+.hero{padding:48px 24px;background:radial-gradient(circle at 20% 20%,#1c407f,#0b1732)}
+.hero h1{margin:0 0 10px;font-size:2rem}
+.hero p{margin:0;opacity:.9}
+main{max-width:980px;margin:0 auto;padding:16px}
+.toc{display:flex;flex-wrap:wrap;gap:10px;position:sticky;top:0;background:#09162fdd;padding:10px;border-radius:12px;backdrop-filter:blur(6px);z-index:2}
+.toc a{color:#cff4ff;text-decoration:none;padding:6px 10px;border:1px solid #2f5d9a;border-radius:999px}
+.panel{margin:18px 0;padding:18px;background:var(--panel);border-radius:16px;box-shadow:0 8px 20px #0004}
+canvas{width:100%;height:auto;background:#0a1224;border-radius:12px;border:1px solid #29508e}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cards article{background:#122952;padding:12px;border-radius:12px;border:1px solid #2d5ca3}
+.controls{margin-top:12px;padding:12px;background:#102447;border-radius:10px}
+footer{text-align:center;padding:24px;opacity:.7}
+@media (max-width:860px){.split,.cards{grid-template-columns:1fr}}

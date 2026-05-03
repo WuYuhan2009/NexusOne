@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高中生物生命活动动态仿真平台</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <h1>人教版高中生物必修一 + 必修二<br/>生命活动动态仿真平台</h1>
+      <p>覆盖细胞结构与代谢、细胞分裂、遗传与变异、中心法则、基因表达调控等核心过程。</p>
+    </div>
+  </header>
+
+  <main>
+    <nav class="toc">
+      <a href="#mitosis">有丝分裂</a>
+      <a href="#meiosis">减数分裂</a>
+      <a href="#replication">DNA复制</a>
+      <a href="#transcription">转录</a>
+      <a href="#translation">翻译</a>
+      <a href="#photosynthesis">光合作用</a>
+      <a href="#respiration">细胞呼吸</a>
+      <a href="#membrane">跨膜运输</a>
+      <a href="#regulation">基因调控与突变</a>
+    </nav>
+
+    <section id="mitosis" class="panel">
+      <h2>有丝分裂动态仿真</h2>
+      <canvas id="mitosisCanvas" width="900" height="320"></canvas>
+      <p>动画依次演示间期（DNA复制完成）→前期（核膜解体、纺锤体形成）→中期（赤道板排列）→后期（姐妹染色单体分离）→末期与胞质分裂（细胞板/缢裂形成）。</p>
+    </section>
+
+    <section id="meiosis" class="panel">
+      <h2>减数分裂动态仿真（I、II 两次分裂）</h2>
+      <canvas id="meiosisCanvas" width="900" height="360"></canvas>
+      <p>重点包含同源染色体联会、四分体、交叉互换、第一次分裂同源染色体分离、第二次分裂姐妹染色单体分离，最终形成 4 个单倍体细胞。</p>
+    </section>
+
+    <section id="replication" class="panel split">
+      <div>
+        <h2>DNA复制</h2>
+        <canvas id="replicationCanvas" width="430" height="240"></canvas>
+        <p>展示解旋酶打开双链、引物形成、DNA聚合酶沿 5'→3' 方向延伸，前导链连续合成与后随链冈崎片段不连续合成。</p>
+      </div>
+      <div>
+        <h2>转录（DNA → RNA）</h2>
+        <canvas id="transcriptionCanvas" width="430" height="240"></canvas>
+        <p>RNA聚合酶识别启动子，沿模板链移动并合成mRNA（U替代T）。</p>
+      </div>
+    </section>
+
+    <section id="translation" class="panel">
+      <h2>翻译（RNA → 蛋白质）</h2>
+      <canvas id="translationCanvas" width="900" height="260"></canvas>
+      <p>mRNA与核糖体结合，tRNA按密码子-反密码子互补配对递送氨基酸，肽链延长并在终止密码子处释放。</p>
+    </section>
+
+    <section id="photosynthesis" class="panel split">
+      <div>
+        <h2>光合作用（叶绿体）</h2>
+        <canvas id="photoCanvas" width="430" height="260"></canvas>
+        <p>光反应：水光解、ATP/NADPH生成；暗反应（卡尔文循环）：CO₂固定并形成有机物。</p>
+      </div>
+      <div id="respiration">
+        <h2>细胞呼吸（线粒体）</h2>
+        <canvas id="respirationCanvas" width="430" height="260"></canvas>
+        <p>糖酵解→丙酮酸氧化→三羧酸循环→氧化磷酸化，逐步释放能量并合成ATP。</p>
+      </div>
+    </section>
+
+    <section id="membrane" class="panel">
+      <h2>跨膜运输与信息交流</h2>
+      <canvas id="membraneCanvas" width="900" height="220"></canvas>
+      <p>包括自由扩散、协助扩散、主动运输、胞吞胞吐，以及受体-配体识别触发胞内信号级联。</p>
+    </section>
+
+    <section id="regulation" class="panel">
+      <h2>遗传规律、基因调控与突变</h2>
+      <div class="cards">
+        <article>
+          <h3>孟德尔分离与自由组合</h3>
+          <p>可视化配子形成、受精组合与性状分离比（3:1，9:3:3:1）形成机制。</p>
+        </article>
+        <article>
+          <h3>基因表达调控</h3>
+          <p>通过“开关”模拟转录因子增强/抑制转录，观察蛋白产量变化。</p>
+        </article>
+        <article>
+          <h3>突变与染色体变异</h3>
+          <p>点突变、插入缺失、染色体重复/倒位/易位的结构后果与表型影响。</p>
+        </article>
+      </div>
+      <div class="controls">
+        <label><input id="switchTF" type="checkbox" checked /> 转录因子激活</label>
+        <label><input id="switchMut" type="checkbox" /> 引入突变（终止提前）</label>
+        <p id="regOutput"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 高中生物仿真平台（教学演示版）</footer>
+  <script src="script.js"></script>
+</body>
+</html>
