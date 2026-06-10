@@ -3,105 +3,136 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>高中生物生命活动动态仿真平台</title>
+  <title>实时角色语音生成方案 · LiliMu / Guoge</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="hero">
-    <div>
-      <h1>人教版高中生物必修一 + 必修二<br/>生命活动动态仿真平台</h1>
-      <p>覆盖细胞结构与代谢、细胞分裂、遗传与变异、中心法则、基因表达调控等核心过程。</p>
+    <p class="eyebrow">Realtime Voice Architecture</p>
+    <h1>文字与语音几乎同时生成的实时角色方案</h1>
+    <p class="lead">目标：降低首字延迟、首音延迟和口播断裂感，同时保持角色人设、系统提示词和刚刚生成效果的一致性。</p>
+    <div class="hero-actions">
+      <a href="#recommendation">推荐方案</a>
+      <a href="#config">配置建议</a>
+      <a href="#personas">角色边界</a>
     </div>
   </header>
 
   <main>
-    <nav class="toc">
-      <a href="#mitosis">有丝分裂</a>
-      <a href="#meiosis">减数分裂</a>
-      <a href="#replication">DNA复制</a>
-      <a href="#transcription">转录</a>
-      <a href="#translation">翻译</a>
-      <a href="#photosynthesis">光合作用</a>
-      <a href="#respiration">细胞呼吸</a>
-      <a href="#membrane">跨膜运输</a>
-      <a href="#regulation">基因调控与突变</a>
-    </nav>
-
-    <section id="mitosis" class="panel">
-      <h2>有丝分裂动态仿真</h2>
-      <canvas id="mitosisCanvas" width="900" height="320"></canvas>
-      <p>动画依次演示间期（DNA复制完成）→前期（核膜解体、纺锤体形成）→中期（赤道板排列）→后期（姐妹染色单体分离）→末期与胞质分裂（细胞板/缢裂形成）。</p>
-    </section>
-
-    <section id="meiosis" class="panel">
-      <h2>减数分裂动态仿真（I、II 两次分裂）</h2>
-      <canvas id="meiosisCanvas" width="900" height="360"></canvas>
-      <p>重点包含同源染色体联会、四分体、交叉互换、第一次分裂同源染色体分离、第二次分裂姐妹染色单体分离，最终形成 4 个单倍体细胞。</p>
-    </section>
-
-    <section id="replication" class="panel split">
+    <section id="recommendation" class="panel accent-panel">
       <div>
-        <h2>DNA复制</h2>
-        <canvas id="replicationCanvas" width="430" height="240"></canvas>
-        <p>展示解旋酶打开双链、引物形成、DNA聚合酶沿 5'→3' 方向延伸，前导链连续合成与后随链冈崎片段不连续合成。</p>
+        <p class="tag">首选</p>
+        <h2>方案 A：端到端 Realtime 语音模型</h2>
+        <p>如果要“文字和语音几乎同时生成”，不要再走 <strong>LLM 完整出字 → TTS 再合成</strong> 的串行链路。首选使用原生多模态实时模型，让同一个会话同时输出文本流和音频流。</p>
       </div>
-      <div>
-        <h2>转录（DNA → RNA）</h2>
-        <canvas id="transcriptionCanvas" width="430" height="240"></canvas>
-        <p>RNA聚合酶识别启动子，沿模板链移动并合成mRNA（U替代T）。</p>
-      </div>
-    </section>
-
-    <section id="translation" class="panel">
-      <h2>翻译（RNA → 蛋白质）</h2>
-      <canvas id="translationCanvas" width="900" height="260"></canvas>
-      <p>mRNA与核糖体结合，tRNA按密码子-反密码子互补配对递送氨基酸，肽链延长并在终止密码子处释放。</p>
-    </section>
-
-    <section id="photosynthesis" class="panel split">
-      <div>
-        <h2>光合作用（叶绿体）</h2>
-        <canvas id="photoCanvas" width="430" height="260"></canvas>
-        <p>光反应：水光解、ATP/NADPH生成；暗反应（卡尔文循环）：CO₂固定并形成有机物。</p>
-      </div>
-      <div id="respiration">
-        <h2>细胞呼吸（线粒体）</h2>
-        <canvas id="respirationCanvas" width="430" height="260"></canvas>
-        <p>糖酵解→丙酮酸氧化→三羧酸循环→氧化磷酸化，逐步释放能量并合成ATP。</p>
+      <div class="metric-grid">
+        <article><strong>低延迟</strong><span>音频边生成边播放</span></article>
+        <article><strong>一致性</strong><span>同一 system prompt 约束文本和语音</span></article>
+        <article><strong>可打断</strong><span>支持 VAD / barge-in</span></article>
       </div>
     </section>
 
-    <section id="membrane" class="panel">
-      <h2>跨膜运输与信息交流</h2>
-      <canvas id="membraneCanvas" width="900" height="220"></canvas>
-      <p>包括自由扩散、协助扩散、主动运输、胞吞胞吐，以及受体-配体识别触发胞内信号级联。</p>
-    </section>
-
-    <section id="regulation" class="panel">
-      <h2>遗传规律、基因调控与突变</h2>
-      <div class="cards">
-        <article>
-          <h3>孟德尔分离与自由组合</h3>
-          <p>可视化配子形成、受精组合与性状分离比（3:1，9:3:3:1）形成机制。</p>
+    <section class="panel">
+      <h2>三种可选架构对比</h2>
+      <div class="compare">
+        <article class="best">
+          <h3>A. Realtime Speech-to-Speech</h3>
+          <p>模型直接理解/生成音频，并同步给前端文本转写或字幕流。适合直播聊天、陪伴式角色、实时对话。</p>
+          <ul>
+            <li>首音最快，断句最自然。</li>
+            <li>角色语气写在会话 instructions/system prompt 中。</li>
+            <li>适合 LiliMu 这类高互动角色。</li>
+          </ul>
         </article>
         <article>
-          <h3>基因表达调控</h3>
-          <p>通过“开关”模拟转录因子增强/抑制转录，观察蛋白产量变化。</p>
+          <h3>B. Streaming LLM + Streaming TTS</h3>
+          <p>LLM token 流分句送入 TTS，前端缓冲 1～2 个短句播放。适合必须精确控制文案的场景。</p>
+          <ul>
+            <li>比串行快，但会有切句和拼接成本。</li>
+            <li>TTS instructions 仍有意义。</li>
+            <li>适合旁白、公告、固定剧本。</li>
+          </ul>
         </article>
         <article>
-          <h3>突变与染色体变异</h3>
-          <p>点突变、插入缺失、染色体重复/倒位/易位的结构后果与表型影响。</p>
+          <h3>C. 先文本后整段 TTS</h3>
+          <p>等文本完全生成后再一次性合成语音。实现简单但不适合“实时几乎同时”。</p>
+          <ul>
+            <li>延迟最高。</li>
+            <li>效果稳定但等待感强。</li>
+            <li>只建议用于非实时导出。</li>
+          </ul>
         </article>
       </div>
-      <div class="controls">
-        <label><input id="switchTF" type="checkbox" checked /> 转录因子激活</label>
-        <label><input id="switchMut" type="checkbox" /> 引入突变（终止提前）</label>
-        <p id="regOutput"></p>
+    </section>
+
+    <section class="panel split" id="config">
+      <div>
+        <h2>config 里还需要写 TTS 提示词吗？</h2>
+        <p class="answer">如果改成端到端 Realtime 语音模型：<strong>通常可以删除独立 ttsPrompt</strong>，把角色说话方式合并进统一的 system / instructions。</p>
+        <p>保留独立 TTS 提示词只适用于 B/C 两种链式方案，因为那时 TTS 是单独模型，需要额外知道“怎么念”。</p>
       </div>
+      <pre><code>// 推荐：Realtime 统一配置
+const realtimeSession = {
+  model: "gpt-realtime",
+  outputModalities: ["text", "audio"],
+  voice: "marin",
+  instructions: PERSONA_PROMPTS.lilimu
+};
+
+// 可删：仅链式 TTS 才需要
+// ttsPrompt: "用可爱萝莉声线念出来..."</code></pre>
+    </section>
+
+    <section class="panel" id="latency">
+      <h2>保证速度与效果的工程策略</h2>
+      <div class="timeline">
+        <div><b>1</b><span>WebRTC 直连</span><small>浏览器实时音频优先 WebRTC；服务端场景再用 WebSocket。</small></div>
+        <div><b>2</b><span>双流输出</span><small>同时订阅 text delta 和 audio delta，字幕不等音频，音频不等全文。</small></div>
+        <div><b>3</b><span>小缓冲播放</span><small>前端维护 100～300ms 音频 jitter buffer，避免卡顿。</small></div>
+        <div><b>4</b><span>VAD + 打断</span><small>检测用户开口后立刻停止当前播报，清空待播缓冲。</small></div>
+        <div><b>5</b><span>提示词收敛</span><small>人设写清楚但不要过长，避免模型每轮重新推理大量无关设定。</small></div>
+      </div>
+    </section>
+
+    <section class="panel" id="personas">
+      <h2>角色 Prompt 合并建议</h2>
+      <div class="persona-grid">
+        <article>
+          <h3>LiliMu（小魅魔 / 可爱萝莉风）</h3>
+          <p>建议定位为<strong>成年虚构角色</strong>，外在风格是娇小、可爱、撒娇、俏皮的小恶魔感；避免任何未成年性化表达。语音风格写入统一 system prompt：轻快、甜软、调皮、亲昵但保持安全边界。</p>
+          <button data-persona="lilimu">查看示例</button>
+        </article>
+        <article>
+          <h3>Guoge（油腻变态下头男）</h3>
+          <p>可以保留“油腻、夸张、自恋、下头”的喜剧标签，但建议明确：不骚扰真实用户、不输出露骨性内容、不攻击现实群体。语音风格：拖腔、浮夸、过度自信、喜剧化。</p>
+          <button data-persona="guoge">查看示例</button>
+        </article>
+      </div>
+      <pre id="personaPreview"><code>点击上方按钮查看角色 instructions 示例。</code></pre>
+    </section>
+
+    <section class="panel docs">
+      <h2>官方文档依据</h2>
+      <p>OpenAI 官方文档将 Realtime API 定位为低延迟、多模态、可音频输入与音频/文本输出的方案；Text-to-Speech 文档则更适合“已确定文本 → 生成语音”的链式或导出场景。</p>
+      <ul class="conclusion">
+        <li><a href="https://platform.openai.com/docs/guides/realtime/" target="_blank" rel="noreferrer">Realtime API 指南</a></li>
+        <li><a href="https://platform.openai.com/docs/guides/audio" target="_blank" rel="noreferrer">Audio and speech 总览</a></li>
+        <li><a href="https://platform.openai.com/docs/guides/text-to-speech" target="_blank" rel="noreferrer">Text to speech 指南</a></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>迁移结论</h2>
+      <ul class="conclusion">
+        <li>要最快：用 Realtime 端到端音频，不要等全文后再 TTS。</li>
+        <li>要“刚刚生成效果”稳定：把角色、口癖、边界、输出格式都放入同一个 system / instructions。</li>
+        <li>若已使用实时语音模型：config 中的独立 ttsPrompt 可以删除，避免和 system prompt 冲突。</li>
+        <li>若仍使用链式 TTS：保留 ttsPrompt，但要从“人设设定”改成“朗读风格参数”。</li>
+      </ul>
     </section>
   </main>
 
-  <footer>© 2026 高中生物仿真平台（教学演示版）</footer>
+  <footer>Realtime voice plan for character agents · LiliMu / Guoge</footer>
   <script src="script.js"></script>
 </body>
 </html>
