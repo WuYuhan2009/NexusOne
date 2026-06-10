@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>实时角色语音生成方案 · LiliMu / Guoge</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">Realtime Voice Architecture</p>
+    <h1>文字与语音几乎同时生成的实时角色方案</h1>
+    <p class="lead">目标：降低首字延迟、首音延迟和口播断裂感，同时保持角色人设、系统提示词和刚刚生成效果的一致性。</p>
+    <div class="hero-actions">
+      <a href="#recommendation">推荐方案</a>
+      <a href="#config">配置建议</a>
+      <a href="#personas">角色边界</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="recommendation" class="panel accent-panel">
+      <div>
+        <p class="tag">首选</p>
+        <h2>方案 A：端到端 Realtime 语音模型</h2>
+        <p>如果要“文字和语音几乎同时生成”，不要再走 <strong>LLM 完整出字 → TTS 再合成</strong> 的串行链路。首选使用原生多模态实时模型，让同一个会话同时输出文本流和音频流。</p>
+      </div>
+      <div class="metric-grid">
+        <article><strong>低延迟</strong><span>音频边生成边播放</span></article>
+        <article><strong>一致性</strong><span>同一 system prompt 约束文本和语音</span></article>
+        <article><strong>可打断</strong><span>支持 VAD / barge-in</span></article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>三种可选架构对比</h2>
+      <div class="compare">
+        <article class="best">
+          <h3>A. Realtime Speech-to-Speech</h3>
+          <p>模型直接理解/生成音频，并同步给前端文本转写或字幕流。适合直播聊天、陪伴式角色、实时对话。</p>
+          <ul>
+            <li>首音最快，断句最自然。</li>
+            <li>角色语气写在会话 instructions/system prompt 中。</li>
+            <li>适合 LiliMu 这类高互动角色。</li>
+          </ul>
+        </article>
+        <article>
+          <h3>B. Streaming LLM + Streaming TTS</h3>
+          <p>LLM token 流分句送入 TTS，前端缓冲 1～2 个短句播放。适合必须精确控制文案的场景。</p>
+          <ul>
+            <li>比串行快，但会有切句和拼接成本。</li>
+            <li>TTS instructions 仍有意义。</li>
+            <li>适合旁白、公告、固定剧本。</li>
+          </ul>
+        </article>
+        <article>
+          <h3>C. 先文本后整段 TTS</h3>
+          <p>等文本完全生成后再一次性合成语音。实现简单但不适合“实时几乎同时”。</p>
+          <ul>
+            <li>延迟最高。</li>
+            <li>效果稳定但等待感强。</li>
+            <li>只建议用于非实时导出。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel split" id="config">
+      <div>
+        <h2>config 里还需要写 TTS 提示词吗？</h2>
+        <p class="answer">如果改成端到端 Realtime 语音模型：<strong>通常可以删除独立 ttsPrompt</strong>，把角色说话方式合并进统一的 system / instructions。</p>
+        <p>保留独立 TTS 提示词只适用于 B/C 两种链式方案，因为那时 TTS 是单独模型，需要额外知道“怎么念”。</p>
+      </div>
+      <pre><code>// 推荐：Realtime 统一配置
+const realtimeSession = {
+  model: "gpt-realtime",
+  outputModalities: ["text", "audio"],
+  voice: "marin",
+  instructions: PERSONA_PROMPTS.lilimu
+};
+
+// 可删：仅链式 TTS 才需要
+// ttsPrompt: "用可爱萝莉声线念出来..."</code></pre>
+    </section>
+
+    <section class="panel" id="latency">
+      <h2>保证速度与效果的工程策略</h2>
+      <div class="timeline">
+        <div><b>1</b><span>WebRTC 直连</span><small>浏览器实时音频优先 WebRTC；服务端场景再用 WebSocket。</small></div>
+        <div><b>2</b><span>双流输出</span><small>同时订阅 text delta 和 audio delta，字幕不等音频，音频不等全文。</small></div>
+        <div><b>3</b><span>小缓冲播放</span><small>前端维护 100～300ms 音频 jitter buffer，避免卡顿。</small></div>
+        <div><b>4</b><span>VAD + 打断</span><small>检测用户开口后立刻停止当前播报，清空待播缓冲。</small></div>
+        <div><b>5</b><span>提示词收敛</span><small>人设写清楚但不要过长，避免模型每轮重新推理大量无关设定。</small></div>
+      </div>
+    </section>
+
+    <section class="panel" id="personas">
+      <h2>角色 Prompt 合并建议</h2>
+      <div class="persona-grid">
+        <article>
+          <h3>LiliMu（小魅魔 / 可爱萝莉风）</h3>
+          <p>建议定位为<strong>成年虚构角色</strong>，外在风格是娇小、可爱、撒娇、俏皮的小恶魔感；避免任何未成年性化表达。语音风格写入统一 system prompt：轻快、甜软、调皮、亲昵但保持安全边界。</p>
+          <button data-persona="lilimu">查看示例</button>
+        </article>
+        <article>
+          <h3>Guoge（油腻变态下头男）</h3>
+          <p>可以保留“油腻、夸张、自恋、下头”的喜剧标签，但建议明确：不骚扰真实用户、不输出露骨性内容、不攻击现实群体。语音风格：拖腔、浮夸、过度自信、喜剧化。</p>
+          <button data-persona="guoge">查看示例</button>
+        </article>
+      </div>
+      <pre id="personaPreview"><code>点击上方按钮查看角色 instructions 示例。</code></pre>
+    </section>
+
+    <section class="panel docs">
+      <h2>官方文档依据</h2>
+      <p>OpenAI 官方文档将 Realtime API 定位为低延迟、多模态、可音频输入与音频/文本输出的方案；Text-to-Speech 文档则更适合“已确定文本 → 生成语音”的链式或导出场景。</p>
+      <ul class="conclusion">
+        <li><a href="https://platform.openai.com/docs/guides/realtime/" target="_blank" rel="noreferrer">Realtime API 指南</a></li>
+        <li><a href="https://platform.openai.com/docs/guides/audio" target="_blank" rel="noreferrer">Audio and speech 总览</a></li>
+        <li><a href="https://platform.openai.com/docs/guides/text-to-speech" target="_blank" rel="noreferrer">Text to speech 指南</a></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>迁移结论</h2>
+      <ul class="conclusion">
+        <li>要最快：用 Realtime 端到端音频，不要等全文后再 TTS。</li>
+        <li>要“刚刚生成效果”稳定：把角色、口癖、边界、输出格式都放入同一个 system / instructions。</li>
+        <li>若已使用实时语音模型：config 中的独立 ttsPrompt 可以删除，避免和 system prompt 冲突。</li>
+        <li>若仍使用链式 TTS：保留 ttsPrompt，但要从“人设设定”改成“朗读风格参数”。</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>Realtime voice plan for character agents · LiliMu / Guoge</footer>
+  <script src="script.js"></script>
+</body>
+</html>
